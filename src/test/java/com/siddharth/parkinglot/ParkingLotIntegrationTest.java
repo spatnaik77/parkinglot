@@ -14,7 +14,7 @@ import static org.junit.Assert.assertNotNull;
 /**
  * Created by Siddharth on 12/7/17.
  */
-public class ParkingLotTest {
+public class ParkingLotIntegrationTest {
 
     static ParkingLotImpl pkLot;
     static int numSlots = 6;

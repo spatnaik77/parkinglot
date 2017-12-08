@@ -26,17 +26,22 @@ public class ParkingLot {
             String fileName = args[0];
             processFileInput(fileName);
         }
-
-        Scanner scanner  = new Scanner(System.in);
-        while(true)
+        else
         {
-            String commandln = scanner.nextLine();
-            processCommand(commandln);
+            System.out.println("Welcome to Parking lot console");
+            printAvailableCommands();
+
+            Scanner scanner = new Scanner(System.in);
+            while (true) {
+                String commandln = scanner.nextLine();
+                processCommand(commandln);
+            }
         }
     }
     private static void printAvailableCommands()
     {
         System.out.println("Available commands:" );
+        System.out.println("\t help");
         System.out.println("\t create_parking_lot <slots>");
         System.out.println("\t park <RegistrationNumber> <Color>");
         System.out.println("\t leave <slot>");
