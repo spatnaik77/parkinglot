@@ -13,9 +13,9 @@ public interface IParkingLot {
 
     public void createParkingLot(int numOfSlots);
 
-    public Slot park(Car c);
+    public int park(Car c);
 
-    public Slot leave(int slotId);
+    public int leave(int slotId);
 
     public int getFreeSlot();
 
@@ -23,7 +23,7 @@ public interface IParkingLot {
 
     public List<Car> getRegistrationNumbers(String color);
 
-    public Slot getSlotForCar(String registrationNumber);
+    public int getSlotForCar(String registrationNumber);
 
-    public List<Slot>  getSlots(String color);
+    public List<Integer>  getSlots(String color);
 }
