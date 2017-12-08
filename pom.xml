@@ -24,7 +24,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.siddharth.parkinglot.ParkingLot</mainClass>
+                            <mainClass>com.siddharth.parkinglot.ParkingLotHealper</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

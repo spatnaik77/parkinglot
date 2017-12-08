@@ -13,7 +13,7 @@ import java.util.Scanner;
 /**
  * Created by sr250345 on 12/8/17.
  */
-public class ParkingLot {
+public class ParkingLotHealper {
 
     static IParkingLot parkingLot;
     public static void main(String[] args)
