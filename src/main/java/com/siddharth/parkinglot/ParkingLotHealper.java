@@ -1,6 +1,8 @@
 package com.siddharth.parkinglot;
 
 import com.siddharth.parkinglot.bo.Car;
+import com.siddharth.parkinglot.bo.Slot;
+import com.siddharth.parkinglot.exception.ParkingNotAvailableException;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -24,11 +26,14 @@ public class ParkingLotHealper {
         if(args.length > 0)
         {
             String fileName = args[0];
+            System.out.println("********************* Going to execute the file input*********************");
             processFileInput(fileName);
         }
         else
         {
-            System.out.println("Welcome to Parking lot console");
+            System.out.println("==============================================================================");
+            System.out.println("********************* WELCOME TO PARKING LOT CONSOLE *********************");
+            System.out.println("==============================================================================");
             printAvailableCommands();
 
             Scanner scanner = new Scanner(System.in);
@@ -57,16 +62,15 @@ public class ParkingLotHealper {
     }
     private static void park(String registrationNumber, String color)
     {
-        int slotId = parkingLot.park(new Car(registrationNumber, color));
-        if(slotId == -1)
+        try
+        {
+            int slotId = parkingLot.park(new Car(registrationNumber, color));
+            System.out.println("Allocated slot number: " + slotId);
+        }
+        catch (ParkingNotAvailableException e)
         {
             System.out.println("Sorry, parking lot is full");
         }
-        else
-        {
-            System.out.println("Allocated slot number: " + slotId);
-        }
-
     }
     private static void leave(int slotId)
     {
@@ -75,14 +79,14 @@ public class ParkingLotHealper {
     }
     private static void status()
     {
-        Map<Integer, Car> slotCarMap = parkingLot.getParkinglotStatus();
+        Map<Slot, Car> slotCarMap = parkingLot.getParkinglotStatus();
 
         System.out.println("Slot No" + "\t" + "Registration No." + "\t" + "Colour");
-        for(Map.Entry<Integer, Car> e : slotCarMap.entrySet())
+        for(Map.Entry<Slot, Car> e : slotCarMap.entrySet())
         {
             if(e.getValue() != null)
             {
-                System.out.println(e.getKey() + "\t" + e.getValue().getRegistrationNumber() + "\t" + e.getValue().getColor());
+                System.out.println(e.getKey().getId() + "\t" + e.getValue().getRegistrationNumber() + "\t" + e.getValue().getColor());
             }
         }
     }
@@ -107,7 +111,7 @@ public class ParkingLotHealper {
     }
     private static void slot_numbers_for_cars_with_colour(String color)
     {
-        List<Integer> whiteSlots =  parkingLot.getSlots(color);
+        List<Slot> whiteSlots =  parkingLot.getSlots(color);
         /*for(Integer slotNum : whiteSlots)
         {
             System.out.print(slotNum + ",");
@@ -115,7 +119,7 @@ public class ParkingLotHealper {
         StringBuffer sb = new StringBuffer();
         for(int c = 0; c < whiteSlots.size(); c++)
         {
-            sb.append(whiteSlots.get(c));
+            sb.append(whiteSlots.get(c).getId());
             if(c != whiteSlots.size()-1)
             {
                 sb.append(", ");
@@ -125,14 +129,14 @@ public class ParkingLotHealper {
     }
     private static void slot_number_for_registration_number(String registrationNumber)
     {
-        int slotId = parkingLot.getSlotForCar(registrationNumber);
-        if(slotId == -1)
+        Slot s = parkingLot.getSlotForCar(registrationNumber);
+        if(s == null)
         {
             System.out.println("Not found");
         }
         else
         {
-            System.out.println(slotId);
+            System.out.println(s.getId());
         }
     }
     private static void processCommand(String commandln)

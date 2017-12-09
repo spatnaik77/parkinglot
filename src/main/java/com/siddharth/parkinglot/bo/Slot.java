@@ -19,5 +19,26 @@ public class Slot {
         this.id = id;
     }
 
+    @Override
+    public String toString() {
+        return "Slot{" +
+                "id=" + id +
+                '}';
+    }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Slot slot = (Slot) o;
+
+        return id == slot.id;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return id;
+    }
 }

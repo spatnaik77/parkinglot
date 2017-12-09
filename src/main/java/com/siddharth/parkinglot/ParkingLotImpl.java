@@ -2,6 +2,7 @@ package com.siddharth.parkinglot;
 
 import com.siddharth.parkinglot.bo.Car;
 import com.siddharth.parkinglot.bo.Slot;
+import com.siddharth.parkinglot.exception.ParkingNotAvailableException;
 
 import java.util.*;
 
@@ -10,41 +11,41 @@ import java.util.*;
  */
 public class ParkingLotImpl implements IParkingLot{
 
-    private TreeMap<Integer, Car> slotCarMap;
+    private Map<Slot, Car> slotCarMap;
     private Map<String, List<Car>> colorCarListMap;
-    private Map<String, Integer> registrationNumberSlotMap;
+    private Map<String, Slot> registrationNumberSlotMap;
 
 
-    public ParkingLotImpl()
+    ParkingLotImpl()
     {
-        slotCarMap = new TreeMap<Integer, Car>();
-
-        /*slotCarMap = new TreeMap<Slot, Car>(new Comparator<Slot>() {
-            public int compare(Slot o1, Slot o2) {
-                return o1.getId() < o2.getId() ? 0: 1;
-            }
-        });*/
+        slotCarMap = new HashMap<Slot, Car>();
 
         colorCarListMap = new HashMap<String, List<Car>>();
 
-        registrationNumberSlotMap = new HashMap<String, Integer>();
+        registrationNumberSlotMap = new HashMap<String, Slot>();
     }
 
     public void createParkingLot(int numOfSlots) {
 
         for(int c = 1; c <= numOfSlots; c++)
         {
-            slotCarMap.put(c, null);
+            slotCarMap.put(new Slot(c), null);
         }
     }
 
-    public int park(Car c) {
+    public int park(Car c) throws ParkingNotAvailableException {
+        //Get the free slot nearest to entrance
         int slotId = getFreeSlot();
         if(slotId > 0)
         {
-            slotCarMap.put(slotId, c);
+            Slot s = new Slot(slotId);
+            slotCarMap.put(s, c);
             addToColorCarListMap(c);
-            addToRegistrationNumberSlotMap(c, slotId);
+            addToRegistrationNumberSlotMap(c, s);
+        }
+        else
+        {
+            throw new ParkingNotAvailableException("Parking full");
         }
 
         //id is -1 when the parkinglot is full
@@ -53,8 +54,8 @@ public class ParkingLotImpl implements IParkingLot{
 
     public int leave(int slotId)
     {
-        Car c = slotCarMap.get(slotId);
-        slotCarMap.put(slotId, null);
+        Car c = slotCarMap.get(new Slot(slotId));
+        slotCarMap.put(new Slot(slotId), null);
         removeFromColorCarListMap(c);
         removeFromRegistrationNumberSlotMap(c);
         return slotId;
@@ -62,30 +63,20 @@ public class ParkingLotImpl implements IParkingLot{
 
     public int getFreeSlot()
     {
-        int c = 1;
-        boolean found = false;
-        for(Map.Entry<Integer, Car> e : slotCarMap.entrySet())
+        int retVal = -1;
+        for(Map.Entry<Slot, Car> e : slotCarMap.entrySet())
         {
             if(e.getValue() == null)
             {
-                found = true;
+                retVal = e.getKey().getId();
                 break;
             }
-            else {
-                c++;
-            }
         }
-        if(found)
-        {
-            return c;
-        }
-        else
-        {
-            return -1;
-        }
+        return retVal;
+
     }
 
-    public Map<Integer, Car> getParkinglotStatus()
+    public Map<Slot, Car> getParkinglotStatus()
     {
         return this.slotCarMap;
     }
@@ -95,20 +86,20 @@ public class ParkingLotImpl implements IParkingLot{
         return colorCarListMap.get(color);
     }
 
-    public int getSlotForCar(String registrationNumber) {
+    public Slot getSlotForCar(String registrationNumber) {
         if(registrationNumberSlotMap.containsKey(registrationNumber))
             return registrationNumberSlotMap.get(registrationNumber);
         else
-            return -1;
+            return null;
     }
 
-    public List<Integer> getSlots(String color) {
+    public List<Slot> getSlots(String color) {
         List<Car> cars = colorCarListMap.get(color);
-        List<Integer> slots = new ArrayList<Integer>();
+        List<Slot> slots = new ArrayList<Slot>();
         for(Car c : cars)
         {
-            int slotId = registrationNumberSlotMap.get(c.getRegistrationNumber());
-            slots.add(slotId);
+            Slot slot = registrationNumberSlotMap.get(c.getRegistrationNumber());
+            slots.add(slot);
         }
         return slots;
     }
@@ -142,10 +133,11 @@ public class ParkingLotImpl implements IParkingLot{
         }
     }
 
-    private void addToRegistrationNumberSlotMap(Car car, int slot)
+    private void addToRegistrationNumberSlotMap(Car car, Slot s)
     {
-        registrationNumberSlotMap.put(car.getRegistrationNumber(), slot);
+        registrationNumberSlotMap.put(car.getRegistrationNumber(), s);
     }
+
     private void removeFromRegistrationNumberSlotMap(Car car)
     {
         registrationNumberSlotMap.remove(car.getRegistrationNumber());

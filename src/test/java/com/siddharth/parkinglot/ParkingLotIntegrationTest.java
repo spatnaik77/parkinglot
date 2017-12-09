@@ -1,6 +1,8 @@
 package com.siddharth.parkinglot;
 
 import com.siddharth.parkinglot.bo.Car;
+import com.siddharth.parkinglot.bo.Slot;
+import com.siddharth.parkinglot.exception.ParkingNotAvailableException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -27,7 +29,7 @@ public class ParkingLotIntegrationTest {
 
 
     @Test
-    public void park()
+    public void park() throws Exception
     {
         pkLot.createParkingLot(6);
         System.out.println("Created a parking lot with " + numSlots + " slots");
@@ -66,24 +68,38 @@ public class ParkingLotIntegrationTest {
 
         System.out.println("Slot number " + slotId + " is free");
 
-        Map<Integer, Car> slotCarMap = pkLot.getParkinglotStatus();
+        Map<Slot, Car> slotCarMap = pkLot.getParkinglotStatus();
 
         System.out.println("Slot No" + "\t" + "Registration No." + "\t" + "Colour");
-        for(Map.Entry<Integer, Car> e : slotCarMap.entrySet())
+        for(Map.Entry<Slot, Car> e : slotCarMap.entrySet())
         {
             if(e.getValue() != null)
                 System.out.println(e.getKey()+ "\t" + e.getValue().getRegistrationNumber() + "\t" + e.getValue().getColor());
         }
 
         //park KA-01-P-333 White
-        pkLot.park(new Car("KA-01-P-333", "White"));
-        slotCarMap = pkLot.getParkinglotStatus();
-        assertEquals(6, slotCarMap.size());
+        try
+        {
+            pkLot.park(new Car("KA-01-P-333", "White"));
+            slotCarMap = pkLot.getParkinglotStatus();
+            assertEquals(6, slotCarMap.size());
+        }
+        catch (ParkingNotAvailableException e)
+        {
+            e.printStackTrace();
+
+        }
 
         //park DL-12-AA-9999 White
-        slotId = pkLot.park(new Car("DL-12-AA-9999", "White"));
-        assertEquals(-1, slotId);
-        System.out.println("Sorry, parking lot is full");
+        try
+        {
+            slotId = pkLot.park(new Car("DL-12-AA-9999", "White"));
+        }
+        catch (ParkingNotAvailableException e)
+        {
+            System.out.println("Sorry, parking lot is full");
+
+        }
 
         List<Car> whiteCars = pkLot.getRegistrationNumbers("White");
         assertEquals(3, whiteCars.size());
@@ -102,20 +118,19 @@ public class ParkingLotIntegrationTest {
         }
 
         //slot_numbers_for_cars_with_colour White
-        List<Integer> whiteSlots =  pkLot.getSlots("White");
+        List<Slot> whiteSlots =  pkLot.getSlots("White");
         assertEquals(3, whiteSlots.size());
-        for(Integer slotNum : whiteSlots)
+        for(Slot s : whiteSlots)
         {
-            System.out.print(slotNum + ",");
+            System.out.print(s.getId() + ",");
         }
 
         //slot_number_for_registration_number KA-01-HH-3141
-        assertEquals(6, pkLot.getSlotForCar("KA-01-HH-3141"));
+        assertEquals(6, pkLot.getSlotForCar("KA-01-HH-3141").getId());
 
         //slot_number_for_registration_number KA-01-HH-3141
-        Integer s = pkLot.getSlotForCar("MH-04-AY-1111");
-        assertEquals(-1, s.intValue());
-
+        Slot slot = pkLot.getSlotForCar("MH-04-AY-1111");
+        assertEquals(null, slot);
         System.out.println("Not found");
 
     }
