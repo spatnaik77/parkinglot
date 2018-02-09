@@ -15,6 +15,9 @@ public class ParkingLotImpl implements IParkingLot{
     private Map<String, List<Car>> colorCarListMap;
     private Map<String, Slot> registrationNumberSlotMap;
 
+    //This will be used to get the free slot with O(1) time complexity
+    PriorityQueue<Integer> freeSlots = new PriorityQueue<Integer>();
+
 
     ParkingLotImpl()
     {
@@ -30,10 +33,13 @@ public class ParkingLotImpl implements IParkingLot{
         for(int c = 1; c <= numOfSlots; c++)
         {
             slotCarMap.put(new Slot(c), null);
+
+            freeSlots.add(c);
         }
     }
 
-    public int park(Car c) throws ParkingNotAvailableException {
+    public int park(Car c) throws ParkingNotAvailableException
+    {
         //Get the free slot nearest to entrance
         int slotId = getFreeSlot();
         if(slotId > 0)
@@ -58,12 +64,22 @@ public class ParkingLotImpl implements IParkingLot{
         slotCarMap.put(new Slot(slotId), null);
         removeFromColorCarListMap(c);
         removeFromRegistrationNumberSlotMap(c);
+
+        //Add it to free slots
+        freeSlots.add(slotId);
+
         return slotId;
     }
 
-    public int getFreeSlot()
+    private int getFreeSlot()
     {
-        int retVal = -1;
+        if(freeSlots.size() > 0) {
+            return freeSlots.poll();
+        }
+        else
+            return -1;
+
+        /*int retVal = -1;
         for(Map.Entry<Slot, Car> e : slotCarMap.entrySet())
         {
             if(e.getValue() == null)
@@ -72,7 +88,7 @@ public class ParkingLotImpl implements IParkingLot{
                 break;
             }
         }
-        return retVal;
+        return retVal;*/
 
     }
 

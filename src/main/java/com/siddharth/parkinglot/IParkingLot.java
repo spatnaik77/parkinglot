@@ -37,12 +37,6 @@ public interface IParkingLot {
     public int leave(int slotId);
 
     /**
-     * Calculates the nearest free slot from entrance
-     * @return
-     */
-    public int getFreeSlot();
-
-    /**
      *
      * @return  a Map containing the Slot and corresponding Cars. For the entries where the value (car) is null is considered
      * as free

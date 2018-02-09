@@ -62,8 +62,7 @@ public class ParkingLotIntegrationTest {
     @Test
     public void status()
     {
-        pkLot.leave(4);
-        int slotId = pkLot.getFreeSlot();
+        int slotId = pkLot.leave(4);
         assertEquals(4, slotId);
 
         System.out.println("Slot number " + slotId + " is free");
@@ -98,7 +97,6 @@ public class ParkingLotIntegrationTest {
         catch (ParkingNotAvailableException e)
         {
             System.out.println("Sorry, parking lot is full");
-
         }
 
         List<Car> whiteCars = pkLot.getRegistrationNumbers("White");
